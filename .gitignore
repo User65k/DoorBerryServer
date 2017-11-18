@@ -1,0 +1,5 @@
+*.dll
+*.exe
+*.log
+files/
+asterisk/manager.d/README.conf
