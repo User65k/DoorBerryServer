@@ -22,6 +22,7 @@ namespace DoorKeeper
 		private Stopwatch debouncing;
 		private GpioConnection door_ctrl, bell_conn, open_conn;
 		private Asterisk asteriskManager;
+		private Notifier bellManager;
 		//OpenDoor + Activate Voice
 		//private const ConnectorPin Buzzer = ConnectorPin.P1Pin36, TelAn = ConnectorPin.P1Pin22;
 		private const ConnectorPin Buzzer = ConnectorPin.P1Pin35, TelAn = ConnectorPin.P1Pin33;
@@ -84,6 +85,8 @@ namespace DoorKeeper
 			
 			CLIInterface cli = new CLIInterface();
 			cli.TuerAuf += TuerAuf;
+
+			bellManager = new Notifier();
 			
 			Console.WriteLine (DateTime.Now.ToString("dd.MM.yy HH:mm:ss")+" Door started");
 		}
@@ -112,6 +115,7 @@ namespace DoorKeeper
 				debouncing.Stop();
 				if(debouncing.Elapsed.TotalMilliseconds > 100) {//50 ist ein kurzer druck
 					asteriskManager.call();
+					bellManager.notifyall();
 				}
 				Console.WriteLine(DateTime.Now.ToString("dd.MM.yy HH:mm:ss")+" Bell 4 "+debouncing.Elapsed.TotalMilliseconds);
 			}
@@ -154,6 +158,7 @@ namespace DoorKeeper
 	
 	public class CLIInterface
 	{
+		//open the door as reaction to traffic on a port (remote control)
 		private Socket listen_socket;
         internal event EventHandler<int> TuerAuf;
 

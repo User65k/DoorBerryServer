@@ -8,6 +8,7 @@ namespace DoorKeeper
 {
 	public class Asterisk
 	{
+		//use an asterisk manager to call/hangup on a number and listen to DTMF presses
 		private const String channel_to_call = "SIP/**610#611#612#622@621";//"SIP/**610@621";
 		private const String asterisk_pw = "password";
 		private const String asterisk_usr = "username";
@@ -146,6 +147,7 @@ Uniqueid: 1444739347.6
 		}
 		private void disconnect()
 		{
+			if(clientSocket==null || !clientSocket.Connected) return;
 			try {
 				clientSocket.Send(Encoding.ASCII.GetBytes("ACTION: LOGOFF\r\n\r\n"));
 
@@ -177,6 +179,8 @@ Uniqueid: 1444739347.6
 				bytesRead = clientSocket.Receive(buffer);
 				string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
+				if (response.StartsWith("Response: Success\r\n"))
+				{
 				/*
 Response: Success
 Message: Authentication accepted
@@ -187,17 +191,19 @@ Status: Fully Booted
 
 				*/
 
-				
-				
-				//start async listening
-				messageBuffer = new byte[2];
-				message = string.Empty;
-				clientSocket.BeginReceive(messageBuffer, 0, 2, SocketFlags.None,
-				new AsyncCallback(OnReceiveMessage), 1);
+					//start async listening
+					messageBuffer = new byte[2];
+					message = string.Empty;
+					clientSocket.BeginReceive(messageBuffer, 0, 2, SocketFlags.None,
+					new AsyncCallback(OnReceiveMessage), 1);
 
+					return true;
+				}else{
+					clientSocket.Shutdown(SocketShutdown.Both);
+					clientSocket.Close();
 
-				//Console.WriteLine("Login: "+response);
-				return response.StartsWith("Response: Success\r\n");
+					return false;
+				}
 
 			} catch (SocketException se) {
 				Console.WriteLine("SocketException : {0}",se.ToString());

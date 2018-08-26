@@ -25,7 +25,7 @@ mcs -t:library *.cs */*.cs -r:System -out:Raspberry.System.dll
 cd Raspberry.IO.GeneralPurpose/
 mcs -t:library *.cs */*.cs -r:System,System.Configuration,Raspberry.IO.Interop,Raspberry.IO,Raspberry.System -lib:../Raspberry.IO.Interop/,../Raspberry.IO/,../Raspberry.System/ -out:Raspberry.IO.GeneralPurpose.dll
 
-mcs /t:exe Main.cs Asterisk.cs /r:System,Raspberry.IO.GeneralPurpose,Raspberry.IO.Interop,Raspberry.System,Raspberry.IO
+mcs /t:exe Main.cs Asterisk.cs Notifier.cs /r:System,Raspberry.IO.GeneralPurpose,Raspberry.IO.Interop,Raspberry.System,Raspberry.IO
 ```
 3. Throw everything on the Pi.
 4. There install mono:
@@ -63,10 +63,11 @@ Last time I checked it ran with: Asterisk 11.13.1
 
 ### More Scripting
 
-If you want to use a script (additionaly to VoIP) to open the door:
+If you want to use a script (additionaly to VoIP) to open the door use Port 14000:
 ```sh
 echo -n "AUF" | nc -q 1 localhost 14000
 ```
+Also clients connected to port 11000 will receive a newline when the bell is detected.
 
 ## Hardware
 
